@@ -3,7 +3,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Domine:wght@700&family=Kaushan+Script&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Pacifico&family=Domine:wght@700&family=Kaushan+Script&display=swap");
 
 @layer components {
   .font_banner_main {
@@ -76,5 +76,8 @@ font-weight: 700;
 }
 .alert_button:focus{
   outline:none !important;
+}
+.footer_font{
+  font-family: 'Pacifico', cursive;
 }
 }
