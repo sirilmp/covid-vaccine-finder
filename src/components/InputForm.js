@@ -13,12 +13,9 @@ function InputForm() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [data, setData] = useState([]);
-  const [session, setSession] = useState([]);
-  const [fee, setFee] = useState([]);
   const [allDistricts, setAllDistricts] = useState([]);
   const [districtCode, setDistrictCode] = useState("");
   const [hideOption, setHideOption] = useState(true);
-  const [districtLoad, setDistrictLoading] = useState(false);
 
  
   //console.log(PINCode);
@@ -109,7 +106,6 @@ function InputForm() {
     e.preventDefault();
     setData([]);
     setMessage("");
-    setDistrictLoading(true);
     await fetch(
       `https://cdn-api.co-vin.in/api/v2/admin/location/districts/17`
     ).then((response) => {
@@ -119,7 +115,6 @@ function InputForm() {
         setHideOption(false);
       });
     });
-    setDistrictLoading(false);
   };
 
   const inputDistrictBtn = async (e) => {
