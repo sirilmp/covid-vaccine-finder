@@ -1,7 +1,5 @@
-import { data } from "autoprefixer";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import getDate from "../constant/dateGenerator";
 import { XIcon } from "@heroicons/react/solid";
 
