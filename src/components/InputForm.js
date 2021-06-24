@@ -20,7 +20,7 @@ function InputForm() {
   const [hideOption, setHideOption] = useState(true);
   const [districtLoad, setDistrictLoading] = useState(false);
 
-  const swal = withReactContent(Swal);
+ 
   //console.log(PINCode);
 
   function truncate(string, n) {
