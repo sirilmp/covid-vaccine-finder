@@ -1,13 +1,80 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+/* ./src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@import url("https://fonts.googleapis.com/css2?family=Domine:wght@700&family=Kaushan+Script&display=swap");
+
+@layer components {
+  .font_banner_main {
+    font-family: "Kaushan Script", cursive;
+  }
+  .font_banner_sub {
+    font-family: "Domine", serif;
+  }
+  .smWidth {
+    width: 1000px;
+  }
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+ .white_space_style{
+   white-space: nowrap;
+ }
+ .text_color_white{
+   color:#fff;
+ }
+ .color_change{
+  background:#fff;
+  color:#79bfa1;
+ }
+ .scroll_bar_style::-webkit-scrollbar {
+  width: 20px;
+}
+.scroll_bar_style::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+.scroll_bar_style::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+}
+.scroll_bar_style::-webkit-scrollbar-thumb {
+  background-color: #79bfa1;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+body::-webkit-scrollbar {
+  width: 15px;
+  
+}
+body::-webkit-scrollbar-track {
+background:rgba(0,0,0,0.0);
+}
+body::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+}
+body::-webkit-scrollbar-thumb {
+  background-color: #79bfa1;
+  border-radius: 20px;
+  border: 6px solid transparent;
+  background-clip: content-box;
+}
+.alert_button{
+  background-color:#79bfa1;
+  color:#fff;
+  padding:10px 15px;
+font-weight: 700;
+  border-radius: 5px; 
+}
+.alert_button:focus{
+  outline:none !important;
+}
 }

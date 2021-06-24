@@ -11,6 +11,12 @@
 # production
 /build
 
+#result data
+/src/components/Results.js
+
+#auto checking 
+/src/pages/Notify.js
+
 # misc
 .DS_Store
 .env.local
