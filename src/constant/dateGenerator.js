@@ -1,5 +1,4 @@
-
-export default function (){
+ function dateGenerator (){
 
     var today = new Date();
 var dd = today.getDate();
@@ -20,3 +19,5 @@ today = dd+'-'+mm+'-'+yyyy;
 return today
 
 }
+
+export default dateGenerator
