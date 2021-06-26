@@ -2,9 +2,8 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import getDate from "../constant/dateGenerator";
 import { XIcon } from "@heroicons/react/solid";
-import { findAllByDisplayValue } from "@testing-library/react";
-import { Redirect, useHistory } from "react-router-dom";
-import addNotification from "react-push-notification";
+//import {useHistory } from "react-router-dom";
+//import addNotification from "react-push-notification";
 
 function InputForm() {
   const [searchByPIN, setSearchByPIN] = useState(true);
@@ -22,7 +21,6 @@ function InputForm() {
   const [doseCode, setDoseCode] = useState("");
   const [showStartSearch, setShowStartSearch] = useState(false);
 
-  const history = useHistory();
   //console.log(PINCode);
 
   function truncate(string, n) {
@@ -310,21 +308,31 @@ function InputForm() {
       alert("This browser does not support desktop notification");
     }
   
+    else if(Notification.permission==="default"||Notification.permission==="denied"){
+        Swal.fire({
+          title:'Sorry...',
+          text: "Please enable browser notification & try agin",
+        })
+        Notification.requestPermission()
+   
+      }
+
     // Let's check whether notification permissions have already been granted
     else if (Notification.permission === "granted") {
       // If it's okay let's create a notification
-      var notification = new Notification("Hi there!");
+      new Notification("working proprrliy");
+      window.location.reload()
     }
   
     // Otherwise, we need to ask the user for permission
-    else if (Notification.permission !== "denied") {
-      Notification.requestPermission().then(function (permission) {
-        // If the user accepts, let's create a notification
-        if (permission === "granted") {
-          var notification = new Notification("Hi there!");
-        }
-      });
-    }
+    // else if (Notification.permission !== "denied") {
+    //   Notification.requestPermission().then(function (permission) {
+    //     // If the user accepts, let's create a notification
+    //     if (permission === "granted") {
+    //       var notification = new Notification("Hi there!");
+    //     }
+    //   });
+    // }
 
 
     // else if(Notification.permission==="default"||Notification.permission==="denied"){

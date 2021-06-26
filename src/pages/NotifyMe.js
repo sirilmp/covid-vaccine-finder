@@ -8,14 +8,14 @@ function NotifyMe() {
     //     })
     // }
 
-    const PINCode= localStorage.getItem('PIN_code')
+    //const PINCode= localStorage.getItem('PIN_code')
 
 
 
   useEffect(() => {
      
          
-      const notification = new notification('hello')
+      //const notification = new notification('hello')
 
     return () => {
     };
