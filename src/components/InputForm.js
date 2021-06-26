@@ -2,8 +2,7 @@ import React, { useState } from "react";
 import Swal from "sweetalert2";
 import getDate from "../constant/dateGenerator";
 import { XIcon } from "@heroicons/react/solid";
-//import {useHistory } from "react-router-dom";
-//import addNotification from "react-push-notification";
+import { useHistory } from "react-router-dom";
 
 function InputForm() {
   const [searchByPIN, setSearchByPIN] = useState(true);
@@ -21,13 +20,11 @@ function InputForm() {
   const [doseCode, setDoseCode] = useState("");
   const [showStartSearch, setShowStartSearch] = useState(false);
 
-  //console.log(PINCode);
+  const history = useHistory();
 
   function truncate(string, n) {
     return string?.length > n ? string.substr(0, n - 1) + "....." : string;
   }
-
-  //console.log(Notification.permission);
 
   const searchByPINClick = (e) => {
     e.preventDefault();
@@ -78,7 +75,7 @@ function InputForm() {
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                backdrop: "rgb(121,191,161,0.5)",
+                backdrop: "rgb(0,0,0,0.8)",
                 text: "No vaccination center !",
                 confirmButtonText: "OK",
                 buttonsStyling: false,
@@ -87,7 +84,6 @@ function InputForm() {
               setData([]);
             } else {
               setMessage("Available centers are...");
-              //  alert('hai')
               setData(data.centers);
             }
           } else if (data.error) {
@@ -95,7 +91,7 @@ function InputForm() {
               icon: "error",
               title: "Oops...",
               text: data.error,
-              backdrop: "rgb(121,191,161,0.5)",
+              backdrop: "rgb(0,0,0,0.8)",
               confirmButtonText: "OK",
               buttonsStyling: false,
               confirmButtonClass: "alert_button",
@@ -105,7 +101,7 @@ function InputForm() {
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              backdrop: "rgb(121,191,161,0.5)",
+              backdrop: "rgb(0,0,0,0.8)",
               text: "Something want wrong please try latter !",
               confirmButtonText: "OK",
               buttonsStyling: false,
@@ -152,7 +148,7 @@ function InputForm() {
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                backdrop: "rgb(121,191,161,0.5)",
+                backdrop: "rgb(0,0,0,0.5)",
                 text: "No vaccination center are available !",
                 confirmButtonText: "OK",
                 buttonsStyling: false,
@@ -161,14 +157,13 @@ function InputForm() {
               setData([]);
             } else {
               setMessage("Available centers are...");
-              //  alert('hai')
               setData(data.centers);
             }
           } else if (data.error) {
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              backdrop: "rgb(121,191,161,0.5)",
+              backdrop: "rgb(0,0,0,0.5)",
               text: data.error,
               confirmButtonText: "OK",
               buttonsStyling: false,
@@ -179,7 +174,7 @@ function InputForm() {
             Swal.fire({
               icon: "error",
               title: "Oops...",
-              backdrop: "rgb(121,191,161,0.5)",
+              backdrop: "rgb(0,0,0,0.5)",
               text: "Something want wrong please try latter !",
               confirmButtonText: "OK",
               buttonsStyling: false,
@@ -202,36 +197,14 @@ function InputForm() {
     setMessage("");
     setLoading(false);
     setShowStartSearch(false);
-    // console.log(session);
-    // console.log(item);
-    // console.log(session.session_id);
-    // console.log(session.date);
-    // console.log(item.pincode);
-    // console.log(dose);
-    // localStorage.setItem("session_id", session.session_id);
-    // localStorage.setItem("checking_date", session.date);
-    //localStorage.setItem("PIN_code", item.pincode);
-
-    // Swal.fire({
-    //   title: "Enter email address",
-
-    //   html: `<input type='number' id='dose_code' class='swal2-input focus:outline-none' placeholder='dose' ></input>`,
-    //   preConfirm: () => {
-    //     const null_dose_code
-    //     const dose_code = Swal.getPopup().querySelector("#dose_code").value;
-    //     if (dose_code && dose_code < 1 || dose_code > 2) {
-    //       Swal.showValidationMessage(`Please enter "1" or "2"`);
-    //     }
-    //     else{
-    //      const null_dose_code=1
-    //     }
-    //     return {dose_code,null_dose_code};
-    //   },
-    // }).then((result) => {
-    //   //console.log( result.value.dose_code);
-    //   localStorage.setItem("dose", result.value.dose_code);
-
-    // });
+    Swal.fire({
+      icon:'warning',
+      title:"How to use ?",
+      html:`<p>Are you a new user ? ,then check <a class='text-iconColor-lightBlue ' href='google.com'>How to use ?</a> otherwise ignore it. </p>`,
+      confirmButtonText: "OK",
+      buttonsStyling: false,
+      confirmButtonClass: "alert_button",
+    })
   };
 
   const checkNotify = async (e) => {
@@ -302,69 +275,7 @@ function InputForm() {
 
   const startSearch = (e) => {
     e.preventDefault();
-    
-
-    if (!("Notification" in window)) {
-      alert("This browser does not support desktop notification");
-    }
-  
-    else if(Notification.permission==="default"||Notification.permission==="denied"){
-        Swal.fire({
-          title:'Sorry...',
-          text: "Please enable browser notification & try agin",
-        })
-        Notification.requestPermission()
-   
-      }
-
-    // Let's check whether notification permissions have already been granted
-    else if (Notification.permission === "granted") {
-     
-      Swal.fire({
-        html:`<audio autoplay>
-        <source src="../images/ag.mp3" type="audio/ogg" >
-        
-      Your browser does not support the audio element.
-      </audio>`
-      })
-    
-    }
-  
-    // Otherwise, we need to ask the user for permission
-    // else if (Notification.permission !== "denied") {
-    //   Notification.requestPermission().then(function (permission) {
-    //     // If the user accepts, let's create a notification
-    //     if (permission === "granted") {
-    //       var notification = new Notification("Hi there!");
-    //     }
-    //   });
-    // }
-
-
-    // else if(Notification.permission==="default"||Notification.permission==="denied"){
-    //   Swal.fire({
-    //     title:'Sorry...',
-    //     text: "Please enable browser notification & try agin",
-    //   })
-    //   Notification.requestPermission()
-    // }
-    // else {
-    //   localStorage.setItem('PIN_code',PINCode)
-    //   localStorage.setItem("dose_id",doseCode)
-    //   localStorage.setItem('date',getDate())
-    //   Swal.fire({
-    //     title: "IMPORTANT !",
-    //     text: "I will close in 30 seconds.",
-    //     html: `
-    //     <div class='text-left text-red-red'>
-    //     <li>Enable browser notification important</li>
-    //     <img src='../images/notification.jpg'>
-    //     </div>     `,
-    //     confirmButtonText: "OK",
-    //     buttonsStyling: false,
-    //     confirmButtonClass: "alert_button",
-    //   })
-    // }
+    history.push("/notifyme");
   };
 
   return (
@@ -462,7 +373,6 @@ function InputForm() {
                 <option value={district.district_id}>
                   {district.district_name}
                 </option>
-                //  <option value="w">wefj</option>
               );
             })}
           </select>
@@ -625,9 +535,13 @@ function InputForm() {
 
                             {doseCode ? (
                               doseCode === "1" ? (
-                                <h1>dose 1</h1>
+                                <h1 className="bg-iconColor-lightBlue mt-2 text-iconColor-white p-2 rounded-lg">
+                                  Dose 1 : {session.available_capacity_dose1}
+                                </h1>
                               ) : (
-                                <h1>dose 2</h1>
+                                <h1 className="bg-iconColor-lightBlue text-iconColor-white p-2 rounded-lg mt-2">
+                                  Dose 2 : {session.available_capacity_dose2}
+                                </h1>
                               )
                             ) : (
                               <div className="grid grid-cols-2 gap-2 mt-3 place-items-center">
