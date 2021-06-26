@@ -372,6 +372,7 @@ function InputForm() {
       <div
         className={` sticky top-16 grid bg-iconColor-lightGreen py-2 place-items-center z-50 mb-10`}
       >
+        <h1>adiouo</h1>
         <div>
           <button
             className={` mb-3 md:mb-1 p-2 focus:outline-none rounded-full text_color_white border font-bold font-mono ml-1 max-w-sm transform translate duration-150 hover:scale-105 hover:bg-opacity-80 mr-2 ${
