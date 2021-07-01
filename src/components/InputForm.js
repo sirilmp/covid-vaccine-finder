@@ -4,6 +4,7 @@ import getDate from "../constant/dateGenerator";
 import { XIcon } from "@heroicons/react/solid";
 import { useHistory } from "react-router-dom";
 
+
 function InputForm() {
   const [searchByPIN, setSearchByPIN] = useState(true);
   const [searchByDistrict, setSearchByDistrict] = useState(false);
@@ -14,11 +15,12 @@ function InputForm() {
   const [data, setData] = useState([]);
   const [allDistricts, setAllDistricts] = useState([]);
   const [districtCode, setDistrictCode] = useState("");
-  const [hideOption, setHideOption] = useState(true);
   const [autoChecker, setAutoChecker] = useState(false);
   const [notifyMe, setNotifyMe] = useState(false);
   const [doseCode, setDoseCode] = useState("");
-  const [showStartSearch, setShowStartSearch] = useState(false);
+  
+  const [ageLimit, setAgeLimit] = useState("");
+  const [vaccine, setVaccine] = useState("");
 
   const history = useHistory();
 
@@ -37,7 +39,7 @@ function InputForm() {
     setLoading(false);
     setMessage("");
     setDoseCode("");
-    setShowStartSearch(false);
+    
   };
 
   const searchByDistrictClick = (e) => {
@@ -48,12 +50,11 @@ function InputForm() {
     setSearchByDistrict(true);
     setData([]);
     setAllDistricts([]);
-    setHideOption(true);
     setWarning("");
     setLoading(false);
     setMessage("");
     setDoseCode("");
-    setShowStartSearch(false);
+    
   };
 
   const inputPINBtn = async (e) => {
@@ -66,51 +67,63 @@ function InputForm() {
       setLoading(true);
       await fetch(
         `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${PINCode}&date=${getDate()}`
-      ).then((response) => {
-        response.json().then((data) => {
-          //console.log(data);
-          setLoading(false);
-          if (data.centers) {
-            if (data.centers && data.centers.length === 0) {
+      )
+        .then((response) => {
+          response.json().then((data) => {
+            //console.log(data);
+            setLoading(false);
+            if (data.centers) {
+              if (data.centers && data.centers.length === 0) {
+                Swal.fire({
+                  icon: "error",
+                  title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+                  backdrop: "rgb(0,0,0,0.8)",
+                  text: "No vaccination center !",
+                  confirmButtonText: "OK",
+                  buttonsStyling: false,
+                  confirmButtonClass: "alert_button bg-red-red opacity-60",
+                });
+                setData([]);
+              } else {
+                setMessage("Available centers are...");
+                setData(data.centers);
+              }
+            } else if (data.error) {
               Swal.fire({
                 icon: "error",
-                title: "Oops...",
+                title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+                text: data.error,
                 backdrop: "rgb(0,0,0,0.8)",
-                text: "No vaccination center !",
                 confirmButtonText: "OK",
                 buttonsStyling: false,
-                confirmButtonClass: "alert_button",
+                confirmButtonClass: "alert_button bg-red-red opacity-60",
               });
               setData([]);
             } else {
-              setMessage("Available centers are...");
-              setData(data.centers);
+              Swal.fire({
+                icon: "error",
+                title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+                backdrop: "rgb(0,0,0,0.8)",
+                text: "Something want wrong please try latter !",
+                confirmButtonText: "OK",
+                buttonsStyling: false,
+                confirmButtonClass: "alert_button bg-red-red opacity-60",
+              });
+              setData([]);
             }
-          } else if (data.error) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: data.error,
-              backdrop: "rgb(0,0,0,0.8)",
-              confirmButtonText: "OK",
-              buttonsStyling: false,
-              confirmButtonClass: "alert_button",
-            });
-            setData([]);
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              backdrop: "rgb(0,0,0,0.8)",
-              text: "Something want wrong please try latter !",
-              confirmButtonText: "OK",
-              buttonsStyling: false,
-              confirmButtonClass: "alert_button",
-            });
-            setData([]);
-          }
+          });
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+            backdrop: "rgb(0,0,0,0.8)",
+            html: `<p class="font-mono text-iconColor-black">Please check you're connection & try agin.</p>`,
+            buttonsStyling: false,
+            confirmButtonClass: "alert_button bg-red-red opacity-60",
+          });
+          setLoading(false);
         });
-      });
     }
   };
 
@@ -118,15 +131,22 @@ function InputForm() {
     e.preventDefault();
     setData([]);
     setMessage("");
-    await fetch(
-      `https://cdn-api.co-vin.in/api/v2/admin/location/districts/17`
-    ).then((response) => {
-      response.json().then((data) => {
-        setAllDistricts(data.districts);
-        //console.log(data.districts);
-        setHideOption(false);
+    await fetch(`https://cdn-api.co-vin.in/api/v2/admin/location/districts/17`)
+      .then((response) => {
+        response.json().then((data) => {
+          setAllDistricts(data.districts);
+        });
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+          backdrop: "rgb(0,0,0,0.8)",
+          buttonsStyling: false,
+          html: `<p class="font-mono text-iconColor-black">Please check you're connection & try agin.</p>`,
+          confirmButtonClass: "alert_button bg-red-red opacity-60",
+        });
       });
-    });
   };
 
   const inputDistrictBtn = async (e) => {
@@ -139,51 +159,63 @@ function InputForm() {
       setLoading(true);
       await fetch(
         `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id=${districtCode}&date=${getDate()}`
-      ).then((response) => {
-        response.json().then((data) => {
-          //console.log(data);
-          setLoading(false);
-          if (data.centers) {
-            if (data.centers && data.centers.length === 0) {
+      )
+        .then((response) => {
+          response.json().then((data) => {
+            //console.log(data);
+            setLoading(false);
+            if (data.centers) {
+              if (data.centers && data.centers.length === 0) {
+                Swal.fire({
+                  icon: "error",
+                  title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+                  backdrop: "rgb(0,0,0,0.8)",
+                  text: "No vaccination center are available !",
+                  confirmButtonText: "OK",
+                  buttonsStyling: false,
+                  confirmButtonClass: "alert_button bg-red-red opacity-60",
+                });
+                setData([]);
+              } else {
+                setMessage("Available centers are...");
+                setData(data.centers);
+              }
+            } else if (data.error) {
               Swal.fire({
                 icon: "error",
-                title: "Oops...",
-                backdrop: "rgb(0,0,0,0.5)",
-                text: "No vaccination center are available !",
+                title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+                backdrop: "rgb(0,0,0,0.8)",
+                text: data.error,
                 confirmButtonText: "OK",
                 buttonsStyling: false,
-                confirmButtonClass: "alert_button",
+                confirmButtonClass: "alert_button bg-red-red opacity-60",
               });
               setData([]);
             } else {
-              setMessage("Available centers are...");
-              setData(data.centers);
+              Swal.fire({
+                icon: "error",
+                title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+                backdrop: "rgb(0,0,0,0.8)",
+                text: "Something want wrong please try latter !",
+                confirmButtonText: "OK",
+                buttonsStyling: false,
+                confirmButtonClass: "alert_button bg-red-red opacity-60",
+              });
+              setData([]);
             }
-          } else if (data.error) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              backdrop: "rgb(0,0,0,0.5)",
-              text: data.error,
-              confirmButtonText: "OK",
-              buttonsStyling: false,
-              confirmButtonClass: "alert_button",
-            });
-            setData([]);
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              backdrop: "rgb(0,0,0,0.5)",
-              text: "Something want wrong please try latter !",
-              confirmButtonText: "OK",
-              buttonsStyling: false,
-              confirmButtonClass: "alert_button",
-            });
-            setData([]);
-          }
+          });
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+            html: `<p class="font-mono text-iconColor-black">Please check you're connection & try agin.</p>`,
+            buttonsStyling: false,
+            backdrop: "rgb(0,0,0,0.8)",
+            confirmButtonClass: "alert_button bg-red-red opacity-60",
+          });
+          setLoading(false);
         });
-      });
     }
   };
 
@@ -196,41 +228,90 @@ function InputForm() {
     setWarning("");
     setMessage("");
     setLoading(false);
-    setShowStartSearch(false);
+    
     Swal.fire({
-      icon:'warning',
-      title:"How to use ?",
-      html:`<p>Are you a new user ? ,then check <a class='text-iconColor-lightBlue ' href='google.com'>How to use ?</a> otherwise ignore it. </p>`,
+      icon: "warning",
+      title: "How to use ?",
+      html: `<p>Are you a new user ? ,then check <a class='text-iconColor-lightBlue ' href='/howtouse'>How to use ?</a> other wise ignore it. </p>`,
       confirmButtonText: "OK",
       buttonsStyling: false,
       confirmButtonClass: "alert_button",
-    })
+      backdrop: "rgb(0,0,0,0.8)",
+    });
   };
 
   const checkNotify = async (e) => {
     e.preventDefault();
-    console.log(PINCode, doseCode);
+    // console.log(PINCode, doseCode);
     if (!PINCode) {
       setWarning("Please enter your PIN Code !");
-    } else if (!doseCode || doseCode > 2 || doseCode < 1) {
-      setWarning("Please enter your  Dose ( 1 or 2) !");
     } else {
       setWarning("");
       // setPINCode("");
       setLoading(true);
       await fetch(
         `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${PINCode}&date=${getDate()}`
-      ).then((response) => {
-        response.json().then((data) => {
-          //console.log(data);
-          setLoading(false);
-          if (data.centers) {
-            if (data.centers && data.centers.length === 0) {
+      )
+        .then((response) => {
+          response.json().then((data) => {
+            //console.log(data);
+            setLoading(false);
+            if (data.centers) {
+              if (data.centers && data.centers.length === 0) {
+                Swal.fire({
+                  icon: "warning",
+                  title: "Searching...",
+                  backdrop: "rgb(0,0,0,0.8)",
+                  html: `<p class='font-mono text-iconColor-black'>Searching with <span class="text-red-red font-semibold">PIN: ${PINCode}</span>, <span class="text-red-red font-semibold">Dose: ${doseCode? doseCode : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> & <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
+                  confirmButtonText: "Notify Me",
+                  showCancelButton: true,
+                  cancelButtonClass:
+                    "alert_button bg-gray-300 ml-3 text-iconColor-black",
+                  buttonsStyling: false,
+                  confirmButtonClass: "alert_button",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    localStorage.setItem("PIN_code", PINCode);
+                    localStorage.setItem("dose_id", doseCode);
+                    localStorage.setItem("age_limit", ageLimit);
+                    localStorage.setItem("vaccine", vaccine);
+                    history.push("/notifyme");
+                  }
+                });
+                setData([]);
+                setMessage("");
+              } else {
+                // setMessage("Available centers are...");
+                // //  alert('hai')
+                // setData(data.centers);
+                // setShowStartSearch(true);
+                Swal.fire({
+                  icon: "warning",
+                  title: "Searching...",
+                  backdrop: "rgb(0,0,0,0.8)",
+                  html: `<p class='font-mono text-iconColor-black'>Searching with <span class="text-red-red font-semibold">PIN: ${PINCode}</span>, <span class="text-red-red font-semibold">Dose: ${doseCode? doseCode : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> & <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
+                  confirmButtonText: "Notify Me",
+                  showCancelButton: true,
+                  cancelButtonClass:
+                    "alert_button bg-gray-300 ml-3 text-iconColor-black",
+                  buttonsStyling: false,
+                  confirmButtonClass: "alert_button",
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    localStorage.setItem("PIN_code", PINCode);
+                    localStorage.setItem("dose_id", doseCode);
+                    localStorage.setItem("age_limit", ageLimit);
+                    localStorage.setItem("vaccine", vaccine);
+                    history.push("/notifyme");
+                  }
+                });
+              }
+            } else if (data.error) {
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                backdrop: "rgb(225,0,0,0.9)",
-                text: "No vaccination center !",
+                text: data.error,
+                backdrop: "rgb(0,0,0,0.8)",
                 confirmButtonText: "OK",
                 buttonsStyling: false,
                 confirmButtonClass: "alert_button",
@@ -238,54 +319,43 @@ function InputForm() {
               setData([]);
               setMessage("");
             } else {
-              setMessage("Available centers are...");
-              //  alert('hai')
-              setData(data.centers);
-              setShowStartSearch(true);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                backdrop: "rgb(0,0,0,0.8)",
+                text: "Something want wrong please try latter !",
+                confirmButtonText: "OK",
+                buttonsStyling: false,
+                confirmButtonClass: "alert_button",
+              });
+              setData([]);
+              setMessage("");
             }
-          } else if (data.error) {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              text: data.error,
-              backdrop: "rgb(225,0,0,0.9)",
-              confirmButtonText: "OK",
-              buttonsStyling: false,
-              confirmButtonClass: "alert_button",
-            });
-            setData([]);
-            setMessage("");
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Oops...",
-              backdrop: "rgb(225,0,0,0.9)",
-              text: "Something want wrong please try latter !",
-              confirmButtonText: "OK",
-              buttonsStyling: false,
-              confirmButtonClass: "alert_button",
-            });
-            setData([]);
-            setMessage("");
-          }
+          });
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            title: `<p class="text-red-red font-mono opacity-60">Error !</p>`,
+            html: `<p class="font-mono text-iconColor-black">Please check you're connection & try agin.</p>`,
+            buttonsStyling: false,
+            backdrop: "rgb(0,0,0,0.8)",
+            confirmButtonClass: "alert_button bg-red-red opacity-60",
+          });
+          setLoading(false);
         });
-      });
     }
-  };
-
-  const startSearch = (e) => {
-    e.preventDefault();
-    history.push("/notifyme");
   };
 
   return (
     <div className="">
+
       <div
-        className={` sticky top-16 grid bg-iconColor-lightGreen py-2 place-items-center z-50 mb-10`}
+        className={` sticky top-16 grid text-center bg-iconColor-lightGreen z-50 mb-10`}
       >
-        <div>
+        <div className="">
           <button
-            className={` mb-3 md:mb-1 p-2 focus:outline-none rounded-full text_color_white border font-bold font-mono ml-1 max-w-sm transform translate duration-150 hover:scale-105 hover:bg-opacity-80 mr-2 ${
+            className={` mb-3 mt-3 md:mb-1 p-2 focus:outline-none rounded-full text_color_white border font-bold font-mono ml-1 max-w-sm transform translate duration-150 hover:scale-105 hover:bg-opacity-80 mr-2 ${
               searchByPIN && "bg-iconColor-white text-iconColor-lightGreen"
             }`}
             onClick={searchByPINClick}
@@ -293,7 +363,7 @@ function InputForm() {
             Search by PIN
           </button>
           <button
-            className={`mb-3 md:mb-1 p-2 focus:outline-none rounded-full text_color_white border font-bold font-mono ml-1 max-w-sm transform translate duration-150 hover:scale-105 hover:bg-opacity-80 ${
+            className={`mb-3 mt-3 md:mb-1 p-2 focus:outline-none rounded-full text_color_white border font-bold font-mono ml-1 max-w-sm transform translate duration-150 hover:scale-105 hover:bg-opacity-80 ${
               searchByDistrict && "bg-iconColor-white text-iconColor-lightGreen"
             }`}
             onClick={searchByDistrictClick}
@@ -301,7 +371,7 @@ function InputForm() {
             Search by District
           </button>
           <button
-            className={`p-2 ml-3 focus:outline-none rounded-full text_color_white border font-bold font-mono max-w-sm transform translate duration-150 hover:scale-105 hover:bg-opacity-80 ${
+            className={` mb-3 mt-3  p-2 ml-3 focus:outline-none rounded-full text_color_white border font-bold font-mono max-w-sm transform translate duration-150 hover:scale-105 hover:bg-opacity-80 ${
               notifyMe && "bg-iconColor-white text-iconColor-lightGreen"
             }`}
             onClick={notifyMeBtn}
@@ -313,14 +383,14 @@ function InputForm() {
 
       {/* search by PIN active this code */}
       <div
-        className={`grid place-items-center mb-10 ${
+        className={`grid text-center mb-8 px-2 ${
           searchByPIN ? "inline" : "hidden "
         }`}
       >
-        <p className="text-red-red mb-3">{warning}</p>
+        <p className="text-red-red mb-3 font-mono font-semibold">{warning}</p>
         <form>
           <input
-            className={`mr-4 h-12 border-2 border-iconColor-lightGreen rounded-lg px-2 placeholder-iconColor-black font-mono focus:outline-none pr-10`}
+            className={`mr-4 h-12 mb-2 border-2 border-iconColor-lightGreen rounded-lg px-2 placeholder-iconColor-black font-mono focus:outline-none pr-10`}
             type="number"
             placeholder="PIN CODE"
             onChange={(e) => {
@@ -353,20 +423,21 @@ function InputForm() {
       {/* search by district active this code */}
 
       <div
-        className={`grid place-items-center mb-10 ${
+        className={`grid text-center mb-8 px-2 bg-iconColor-white z-50 ${
           searchByDistrict ? "inline" : "hidden "
         }`}
       >
-        {hideOption ? <p className="text-red-red mb-3">{warning}</p> : <></>}
+        {<p className="text-red-red mb-3 font-mono font-semibold">{warning}</p>}
         <form>
           <select
+            className="custom_selector"
             onClick={inputDistrictOptions}
             onChange={(e) => {
               setDistrictCode(e.target.value);
             }}
-            className="mr-4 cursor-pointer font-mono h-12 pl-3 pr-6 text-base border-iconColor-lightGreen  placeholder-gray-600 border-2 rounded-lg appearance-none focus:outline-none"
+            className="mr-4 mb-3  cursor-pointer font-mono h-12 pl-3 pr-6 text-base border-iconColor-lightGreen  placeholder-gray-600 border-2 rounded-lg appearance-none focus:outline-none"
           >
-            {hideOption ? <option value="">Select a District</option> : null}
+            <option value="">Select a District</option>
             {allDistricts.map((district) => {
               return (
                 // console.log(district),
@@ -378,7 +449,7 @@ function InputForm() {
           </select>
           {loading ? (
             <button
-              className="focus:outline-none cursor-not-allowed absolute z-0"
+              className="focus:outline-none mb-3 cursor-not-allowed absolute z-0"
               disabled
             >
               <img
@@ -389,7 +460,7 @@ function InputForm() {
             </button>
           ) : (
             <button
-              className={`text-iconColor-white font-mono bg-iconColor-lightGreen rounded-md p-2 font-semibold transform translate duration-150 hover:scale-105 hover:bg-opacity-80 cursor-pointer focus:outline-none focus:bg-opacity-80`}
+              className={`text-iconColor-white mb-3 font-mono bg-iconColor-lightGreen rounded-md p-2 font-semibold transform translate duration-150 hover:scale-105 hover:bg-opacity-80 cursor-pointer focus:outline-none focus:bg-opacity-80`}
               onClick={inputDistrictBtn}
             >
               Search
@@ -401,42 +472,52 @@ function InputForm() {
       {/* notify me active */}
 
       <div
-        className={`grid place-items-center mb-10 ${
+        className={`grid text-center mb-8 px-2 ${
           autoChecker ? "inline" : "hidden "
         }`}
       >
-        <p className="text-red-red mb-3">{warning}</p>
+        <p className="text-red-red mb-3 font-mono font-semibold">{warning}</p>
         <form>
           <input
-            className={`mr-4 w-36 h-12 border-2 border-iconColor-lightGreen rounded-lg px-2 placeholder-iconColor-black font-mono focus:outline-none pr-10`}
+            className={`mr-4 mb-2  w-36 h-12 border-2 border-iconColor-lightGreen rounded-lg px-2 placeholder-iconColor-black font-mono focus:outline-none pr-10`}
             type="number"
             placeholder="PIN CODE"
             onClick={() => {
               setPINCode("");
               setData([]);
               setMessage("");
-              setShowStartSearch(false);
             }}
             onChange={(e) => {
               setPINCode(e.target.value);
             }}
             value={PINCode}
           />
-          <input
-            className={`mr-4 w-24 h-12 border-2 border-iconColor-lightGreen rounded-lg px-2 placeholder-iconColor-black font-mono focus:outline-none pr-10`}
-            type="number"
-            placeholder="Dose"
-            onClick={() => {
-              setDoseCode("");
-              setData([]);
-              setMessage("");
-              setShowStartSearch(false);
-            }}
-            onChange={(e) => {
-              setDoseCode(e.target.value);
-            }}
-            value={doseCode}
-          />
+          <select
+            className="mr-4 mb-2  cursor-pointer font-mono h-12 pl-3 pr-6 text-base border-iconColor-lightGreen  placeholder-gray-600 border-2 rounded-lg appearance-none focus:outline-none"
+            onChange={(e) => setDoseCode(e.target.value)}
+          >
+            <option value="">DOSE</option>
+            <option value="1">Dose 1</option>
+            <option value="2">Dose 2</option>
+          </select>
+
+          <select
+            className="mr-4 mb-2  cursor-pointer font-mono h-12 pl-3 pr-6 text-base border-iconColor-lightGreen  placeholder-gray-600 border-2 rounded-lg appearance-none focus:outline-none"
+            onChange={(e) => setAgeLimit(e.target.value)}
+          >
+            <option value="">AGE</option>
+            <option value="18">18-44</option>
+            <option value="45">45+</option>
+          </select>
+
+          <select
+            className="mr-4 mb-2 cursor-pointer font-mono h-12 pl-3 pr-6 text-base border-iconColor-lightGreen  placeholder-gray-600 border-2 rounded-lg appearance-none focus:outline-none"
+            onChange={(e) => setVaccine(e.target.value)}
+          >
+            <option value="">VACCINE</option>
+            <option value="COVISHIELD">COVISHIELD</option>
+            <option value="COVAXIN">COVAXIN</option>
+          </select>
 
           {loading ? (
             <button
@@ -463,11 +544,13 @@ function InputForm() {
       <div className="bg-iconColor-lightBlue mb-12">
         <p className="py-3 text-center text-iconColor-white">{message}</p>
       </div>
+      <div className=''>
       {data.length > 0
         ? data.map((item) => {
             return (
               //console.log(item),
-              <div className="w-auto  overflow-x-scroll scroll_bar_style mb-10 ml-1 mr-1">
+              
+                <div className="w-auto  overflow-scroll scroll_bar_style mb-10 ml-1 mr-1">
                 <table className="cursor-pointer">
                   <tbody>
                     <tr className=" white_space_style">
@@ -526,24 +609,12 @@ function InputForm() {
                           <td className="font-mono p-2 border border-gray-200 text-center align-top leading-8 ">
                             <div>
                               <td className="bg-iconColor-lightGreen p-2 text-iconColor-lightGreenOP20 px-2 rounded-lg">
-                                Age {session.min_age_limit}+
+                                Age {session.min_age_limit>=45 ? "45+":"18-45"}
                               </td>
                               <td className="bg-iconColor-lightGreen p-2 text-iconColor-lightGreenOP20 px-2 rounded-lg">
                                 {session.vaccine}
                               </td>
                             </div>
-
-                            {doseCode ? (
-                              doseCode === "1" ? (
-                                <h1 className="bg-iconColor-lightBlue mt-2 text-iconColor-white p-2 rounded-lg">
-                                  Dose 1 : {session.available_capacity_dose1}
-                                </h1>
-                              ) : (
-                                <h1 className="bg-iconColor-lightBlue text-iconColor-white p-2 rounded-lg mt-2">
-                                  Dose 2 : {session.available_capacity_dose2}
-                                </h1>
-                              )
-                            ) : (
                               <div className="grid grid-cols-2 gap-2 mt-3 place-items-center">
                                 <td className="bg-iconColor-lightBlue text-iconColor-white p-2 rounded-lg">
                                   Dose 1
@@ -564,7 +635,7 @@ function InputForm() {
                                   <p>{session.available_capacity_dose2}</p>
                                 )}
                               </div>
-                            )}
+                       
                           </td>
                         );
                       })}
@@ -572,21 +643,11 @@ function InputForm() {
                   </tbody>
                 </table>
               </div>
+            
             );
           })
         : null}
-      {showStartSearch ? (
-        <div className="grid place-items-center w-sm">
-          <button
-            className="bg-gray-100 mb-10 p-2 cursor-pointer font-mono rounded-lg transform translate duration-150 hover:bg-gray-200 focus:outline-none"
-            onClick={startSearch}
-          >
-            Start Searching
-          </button>
-        </div>
-      ) : (
-        <></>
-      )}
+          </div>
     </div>
   );
 }
