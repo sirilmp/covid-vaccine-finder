@@ -232,12 +232,19 @@ function InputForm() {
     Swal.fire({
       icon: "warning",
       title: "How to use ?",
-      html: `<p>Are you a new user ? ,then check <a class='text-iconColor-lightBlue ' href='/howtouse'>How to use ?</a> other wise ignore it. </p>`,
-      confirmButtonText: "OK",
+      html: `<p>Are you a new user ? ,then check how to use ? 👇, other wise ignore it. </p>`,
+      confirmButtonText: "How to use ?",
       buttonsStyling: false,
+      showCancelButton:true,
+      cancelButtonText:"OK",
+      cancelButtonClass:"alert_button bg-gray-200 text-iconColor-black ml-2",
       confirmButtonClass: "alert_button",
       backdrop: "rgb(0,0,0,0.8)",
-    });
+    }).then((result) => {
+      if(result.isConfirmed){
+        history.push('/howtouse')
+      }
+    })
   };
 
   const checkNotify = async (e) => {

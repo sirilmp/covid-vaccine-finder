@@ -373,7 +373,9 @@ history.push("/");
             <h2 className="text-5xl font_banner_main text-iconColor-lightBlue font-bold tracking-wide">
               Searching
             </h2>
-            <div className="w-16 ml-1 text-center mt-7">
+
+            {loading ?  <>
+              <div className="w-16 ml-1 text-center mt-7">
               <div class="load-wrapp">
                 <div class="load-1">
                   <div class="line"></div>
@@ -382,6 +384,8 @@ history.push("/");
                 </div>
               </div>
             </div>
+            </>:<></>}
+
           </div>
           <img
             className=" sm:w-full sm:h-full max-w-md object-cover w-180"
@@ -391,7 +395,7 @@ history.push("/");
         </div>
       </div>
 
-      {loading ? (
+      {/* {loading ? (
         <>
           <div class="multi-spinner-container">
             <div class="multi-spinner">
@@ -409,7 +413,7 @@ history.push("/");
         </>
       ) : (
         <></>
-      )}
+      )} */}
     </div>
   );
 }
