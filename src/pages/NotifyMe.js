@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 import Swal from "sweetalert2";
 import getDate from "../constant/dateGenerator";
@@ -9,7 +9,7 @@ function NotifyMe() {
   const vaccine = localStorage.getItem("vaccine");
   const [outData, setOutData] = useState([]);
   const [loading, setLoading] = useState(false);
-let    timerInterval
+let timerInterval =useRef()
   let totalDose = 0;
   const history = useHistory();
 
@@ -20,92 +20,90 @@ let    timerInterval
   //get API
 
   useEffect( () => {
-
-    async function getData() {
-      setLoading(true);
-      await fetch(
-        `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${PINCode}&date=${getDate()}`
-      )
-        .then((response) => {
-          response.json().then((data) => {
-            setOutData(data.centers);
-  
-            if (data.centers) {
-              if (data.centers && data.centers.length === 0) {
-                Swal.fire({
-                  title: "Auto Refreshing !",
-                  html: `<p class='font-mono'>Refresh in <b></b><br><br>Do you want cancel auto searching, <span class='text-iconColor-black font-semibold'></span> <span class='text-red-red font-bold'>PIN: ${PINCode}<span/> , <span class='text-iconColor-black font-semibold'> <span class="text-red-red font-semibold">Dose: ${doseId? doseId : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
-                  timer: 360000,
-                  timerProgressBar: true,
-                  allowOutsideClick: false,
-                  confirmButtonText: "Cancel",
-                  backdrop: "rgb(0,0,0,0.8)",
-                  buttonsStyling: false,
-                  confirmButtonClass: "alert_button bg-gray-300",
-  
-                  didOpen: () => {
-                    // Swal.showLoading();
-                    timerInterval = setInterval(() => {
-                      const content = Swal.getHtmlContainer();
-                      if (content) {
-                        const b = content.querySelector("b");
-                        if (b) {
-                          var time = Swal.getTimerLeft() / 60000;
-                          b.textContent = time.toFixed(2);
-                        }
-                      }
-                    }, 100);
-                  },
-                  willClose: () => {
-                    clearInterval(timerInterval);
-                  },
-                }).then((result) => {
-                  if (result.dismiss === Swal.DismissReason.timer) {
-                    window.location.reload();
-                  }
-                  if (result.isConfirmed) {
-                    localStorage.clear();
-                    Swal.fire({
-                      title: "Canceled !",
-                      allowOutsideClick: false,
-                      text: "Auto search canceled successfully.",
-                      buttonsStyling: false,
-                      confirmButtonClass: "alert_button",
-                      backdrop: "rgb(0,0,0,0.8)",
-                    }).then((result) => {
-                      if (result.isConfirmed) {
-                        history.push("/");
-                      }
-                    });
-                  }
-                });
-              }
-            }
-          });
-        })
-        .catch((error) => {
-          Swal.fire({
-            icon: "error",
-            timer: 60000,
-            title: `<p class="text-red-red font-mono opacity-60">Connection failed !</p>`,
-            backdrop: "rgb(0,0,0,0.8)",
-  
-            html: `<p class="font-mono text-iconColor-black">Please check you're internet connection & refresh manually. <iframe title="title alert_sound" class='w-0' src="../images/alert_sound.mp3" allow="autoplay"></iframe></p> `,
-            buttonsStyling: false,
-            confirmButtonClass: "alert_button bg-red-red opacity-60",
-          }).then((result) => {
-            if (result.dismiss === Swal.DismissReason.timer) {
-              window.location.reload();
-            }
-          });
-        });
-        setLoading(false);  
-    }
     getData(); 
       
   },[]);
 
-  
+  async function getData() {
+    setLoading(true);
+    await fetch(
+      `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${PINCode}&date=${getDate()}`
+    )
+      .then((response) => {
+        response.json().then((data) => {
+          setOutData(data.centers);
+
+          if (data.centers) {
+            if (data.centers && data.centers.length === 0) {
+              Swal.fire({
+                title: "Auto Refreshing !",
+                html: `<p class='font-mono'>Refresh in <b></b><br><br>Do you want cancel auto searching, <span class='text-iconColor-black font-semibold'></span> <span class='text-red-red font-bold'>PIN: ${PINCode}<span/> , <span class='text-iconColor-black font-semibold'> <span class="text-red-red font-semibold">Dose: ${doseId? doseId : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
+                timer: 360000,
+                timerProgressBar: true,
+                allowOutsideClick: false,
+                confirmButtonText: "Cancel",
+                backdrop: "rgb(0,0,0,0.8)",
+                buttonsStyling: false,
+                confirmButtonClass: "alert_button bg-gray-300",
+
+                didOpen: () => {
+                  // Swal.showLoading();
+                timerInterval= setInterval(() => {
+                    const content = Swal.getHtmlContainer();
+                    if (content) {
+                      const b = content.querySelector("b");
+                      if (b) {
+                        var time = Swal.getTimerLeft() / 60000;
+                        b.textContent = time.toFixed(2);
+                      }
+                    }
+                  }, 100);
+                },
+                willClose: () => {
+                  clearInterval(timerInterval.current);
+                },
+              }).then((result) => {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                  window.location.reload();
+                }
+                if (result.isConfirmed) {
+                  localStorage.clear();
+                  Swal.fire({
+                    title: "Canceled !",
+                    allowOutsideClick: false,
+                    text: "Auto search canceled successfully.",
+                    buttonsStyling: false,
+                    confirmButtonClass: "alert_button",
+                    backdrop: "rgb(0,0,0,0.8)",
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      history.push("/");
+                    }
+                  });
+                }
+              });
+            }
+          }
+        });
+      })
+      .catch((error) => {
+        Swal.fire({
+          icon: "error",
+          timer: 60000,
+          title: `<p class="text-red-red font-mono opacity-60">Connection failed !</p>`,
+          backdrop: "rgb(0,0,0,0.8)",
+
+          html: `<p class="font-mono text-iconColor-black">Please check you're internet connection & refresh manually. <iframe title="title alert_sound" class='w-0' src="../images/alert_sound.mp3" allow="autoplay"></iframe></p> `,
+          buttonsStyling: false,
+          confirmButtonClass: "alert_button bg-red-red opacity-60",
+        }).then((result) => {
+          if (result.dismiss === Swal.DismissReason.timer) {
+            window.location.reload();
+          }
+        });
+      });
+      setLoading(false);  
+  }
   
 
 
