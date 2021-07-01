@@ -295,7 +295,7 @@ console.log(data.centers);
      else if (totalDose === 0 || outData[0]) {
        Swal.fire({
          title: "Auto Refreshing !",
-         html: `<p class='font-mono'>Refresh in <b></b><br><br>Do you want cancel auto searching, <span class='text-iconColor-black font-semibold'>PIN:</span> <span class='text-red-red font-bold'> ${PINCode}<span/> , <span class='text-iconColor-black font-semibold'> <span class="text-red-red font-semibold">Dose: ${doseId? doseId : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
+         html: `<p class='font-mono'>Refresh in <b></b><br><br>Do you want cancel auto searching, <span class='text-red-red font-bold'>PIN: ${PINCode}<span/> , <span class='text-iconColor-black font-semibold'> <span class="text-red-red font-semibold">Dose: ${doseId? doseId : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
          timer: 360000,
          timerProgressBar: true,
          allowOutsideClick: false,

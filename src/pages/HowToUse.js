@@ -248,13 +248,13 @@ function HowToUse() {
 
       <div className="mt-28 p-10">
         <a
-          className="p-2 mr-2 bg-iconColor-lightBlue font-mono font-semibold text-iconColor-white rounded-md transform translate duration-150  hover:scale-105"
+          className="p-2 mr-2 font-mono font-semibold text-iconColor-black rounded-md transform translate duration-150   hover:bg-gray-100 hover:shadow-sm"
           href="mailto: sirilmp.online@gmail.com"
         >
           Support
         </a>
         <a
-          className="p-2 ml-2 bg-iconColor-lightBlue font-mono font-semibold text-iconColor-white rounded-md"
+          className="p-2 ml-2 font-mono font-semibold text-iconColor-black rounded-md transform translate duration-150   hover:bg-gray-100 hover:shadow-sm"
           href="https://sirilmp.online/"
         >
           Developer
