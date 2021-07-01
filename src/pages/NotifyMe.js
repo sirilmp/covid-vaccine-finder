@@ -252,12 +252,6 @@ function NotifyMe() {
       // console.log(ageLimit);
     }
 
-const alert_audio=document.getElementById('alert_audio')
-
-function autoplay(){
-  alert_audio.play()
-}
-
     //console.log(totalDose);
     if (!doseId) {
      // console.log("dose id");
