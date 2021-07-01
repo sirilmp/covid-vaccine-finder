@@ -9,9 +9,8 @@ function NotifyMe() {
   const vaccine = localStorage.getItem("vaccine");
   const [outData, setOutData] = useState([]);
   const [loading, setLoading] = useState(false);
-
+let    timerInterval
   let totalDose = 0;
-  let timerInterval;
   const history = useHistory();
 
   if(PINCode=== null){
@@ -20,321 +19,332 @@ function NotifyMe() {
 
   //get API
 
-  async function getData() {
-    setLoading(true);
-    await fetch(
-      `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${PINCode}&date=${getDate()}`
-    )
-      .then((response) => {
-        response.json().then((data) => {
-          setOutData(data.centers);
-
-          if (data.centers) {
-            if (data.centers && data.centers.length === 0) {
-              Swal.fire({
-                title: "Auto Refreshing !",
-                html: `Refresh in <b></b>. <br><br>Do you want cancel auto searching, <span class='text-iconColor-black font-semibold'>PIN:</span> <span class='text-red-red font-bold'> ${PINCode}<span/> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class='text-iconColor-black font-semibold'>Dose:</span> ${doseId}`,
-                timer: 360000,
-                timerProgressBar: true,
-                allowOutsideClick: false,
-                confirmButtonText: "Cancel",
-                backdrop: "rgb(0,0,0,0.8)",
-                buttonsStyling: false,
-                confirmButtonClass: "alert_button bg-gray-300",
-
-                didOpen: () => {
-                  // Swal.showLoading();
-                  timerInterval = setInterval(() => {
-                    const content = Swal.getHtmlContainer();
-                    if (content) {
-                      const b = content.querySelector("b");
-                      if (b) {
-                        var time = Swal.getTimerLeft() / 60000;
-                        b.textContent = time.toFixed(2);
-                      }
-                    }
-                  }, 100);
-                },
-                willClose: () => {
-                  clearInterval(timerInterval);
-                },
-              }).then((result) => {
-                if (result.dismiss === Swal.DismissReason.timer) {
-                  window.location.reload();
-                }
-                if (result.isConfirmed) {
-                  localStorage.clear();
-                  Swal.fire({
-                    title: "Canceled !",
-                    allowOutsideClick: false,
-                    text: "Auto search canceled successfully.",
-                    buttonsStyling: false,
-                    confirmButtonClass: "alert_button",
-                    backdrop: "rgb(0,0,0,0.8)",
-                  }).then((result) => {
-                    if (result.isConfirmed) {
-                      history.push("/");
-                    }
-                  });
-                }
-              });
-            }
-          }
-        });
-      })
-      .catch((error) => {
-        Swal.fire({
-          icon: "error",
-          timer: 60000,
-          title: `<p class="text-red-red font-mono opacity-60">Connection failed !</p>`,
-          backdrop: "rgb(0,0,0,0.8)",
-
-          html: `<p class="font-mono text-iconColor-black">Please check you're internet connection & refresh manually. <iframe title="title alert_sound" class='w-0' src="../images/alert_sound.mp3" allow="autoplay"></iframe></p> `,
-          buttonsStyling: false,
-          confirmButtonClass: "alert_button bg-red-red opacity-60",
-        }).then((result) => {
-          if (result.dismiss === Swal.DismissReason.timer) {
-            window.location.reload();
-          }
-        });
-      });
-
-    setLoading(false);
-  }
-
   useEffect( () => {
-    getData();
-  }, []);
 
-  outData.map((items) => {
-    for (let i = 0; i < items.sessions.length; i++) {
-     // console.log(items.sessions[i]);
-      // console.log("loop 1");
-      //console.log(vaccine, items.sessions[i].vaccine);
-
-      if (vaccine) {
-        if (vaccine === items.sessions[i].vaccine) {
-          if (ageLimit === "18") {
-            if (items.sessions[i].min_age_limit <= 44) {
-              if (doseId === "2") {
-                if (items.sessions[i].available_capacity_dose2 > 0) {
-                  //console.log("dose is ready");
-                  totalDose =
-                    items.sessions[i].available_capacity_dose2 + totalDose;
-                }
-              } else if (doseId === "1") {
-                if (items.sessions[i].available_capacity_dose1 > 0) {
-                  //console.log("dose is ready");
-                  totalDose =
-                    items.sessions[i].available_capacity_dose1 + totalDose;
-                }
-              } else if (!doseId) {
-                if (items.sessions[i].available_capacity > 0) {
-                  //console.log("dose is ready");
-                  totalDose = items.sessions[i].available_capacity + totalDose;
-                }
+    async function getData() {
+      setLoading(true);
+      await fetch(
+        `https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByPin?pincode=${PINCode}&date=${getDate()}`
+      )
+        .then((response) => {
+          response.json().then((data) => {
+            setOutData(data.centers);
+  
+            if (data.centers) {
+              if (data.centers && data.centers.length === 0) {
+                Swal.fire({
+                  title: "Auto Refreshing !",
+                  html: `<p class='font-mono'>Refresh in <b></b><br><br>Do you want cancel auto searching, <span class='text-iconColor-black font-semibold'></span> <span class='text-red-red font-bold'>PIN: ${PINCode}<span/> , <span class='text-iconColor-black font-semibold'> <span class="text-red-red font-semibold">Dose: ${doseId? doseId : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
+                  timer: 360000,
+                  timerProgressBar: true,
+                  allowOutsideClick: false,
+                  confirmButtonText: "Cancel",
+                  backdrop: "rgb(0,0,0,0.8)",
+                  buttonsStyling: false,
+                  confirmButtonClass: "alert_button bg-gray-300",
+  
+                  didOpen: () => {
+                    // Swal.showLoading();
+                    timerInterval = setInterval(() => {
+                      const content = Swal.getHtmlContainer();
+                      if (content) {
+                        const b = content.querySelector("b");
+                        if (b) {
+                          var time = Swal.getTimerLeft() / 60000;
+                          b.textContent = time.toFixed(2);
+                        }
+                      }
+                    }, 100);
+                  },
+                  willClose: () => {
+                    clearInterval(timerInterval);
+                  },
+                }).then((result) => {
+                  if (result.dismiss === Swal.DismissReason.timer) {
+                    window.location.reload();
+                  }
+                  if (result.isConfirmed) {
+                    localStorage.clear();
+                    Swal.fire({
+                      title: "Canceled !",
+                      allowOutsideClick: false,
+                      text: "Auto search canceled successfully.",
+                      buttonsStyling: false,
+                      confirmButtonClass: "alert_button",
+                      backdrop: "rgb(0,0,0,0.8)",
+                    }).then((result) => {
+                      if (result.isConfirmed) {
+                        history.push("/");
+                      }
+                    });
+                  }
+                });
               }
-            }
-          }
-
-          if (ageLimit === "45") {
-            if (items.sessions[i].min_age_limit >= 45) {
-              if (doseId === "2") {
-                if (items.sessions[i].available_capacity_dose2 > 0) {
-                  //console.log("dose is ready");
-                  totalDose =
-                    items.sessions[i].available_capacity_dose2 + totalDose;
-                }
-              } else if (doseId === "1") {
-                if (items.sessions[i].available_capacity_dose1 > 0) {
-                  //console.log("dose is ready");
-                  totalDose =
-                    items.sessions[i].available_capacity_dose1 + totalDose;
-                }
-              } else if (!doseId) {
-                if (items.sessions[i].available_capacity > 0) {
-                  //console.log("dose is ready");
-                  totalDose = items.sessions[i].available_capacity + totalDose;
-                }
-              }
-            }
-          }
-
-          if (!ageLimit) {
-            if (doseId === "2") {
-              if (items.sessions[i].available_capacity_dose2 > 0) {
-                //console.log("dose is ready");
-                totalDose =
-                  items.sessions[i].available_capacity_dose2 + totalDose;
-              }
-            } else if (doseId === "1") {
-              if (items.sessions[i].available_capacity_dose1 > 0) {
-                //console.log("dose is ready");
-                totalDose =
-                  items.sessions[i].available_capacity_dose1 + totalDose;
-              }
-            } else if (!doseId) {
-              if (items.sessions[i].available_capacity > 0) {
-                //console.log("dose is ready");
-                totalDose = items.sessions[i].available_capacity + totalDose;
-              }
-            }
-          }
-        }
-      } else if (!vaccine) {
-        if (ageLimit === "18") {
-          if (items.sessions[i].min_age_limit <= 44) {
-            if (doseId === "2") {
-              if (items.sessions[i].available_capacity_dose2 > 0) {
-                //console.log("dose is ready");
-                totalDose =
-                  items.sessions[i].available_capacity_dose2 + totalDose;
-              }
-            } else if (doseId === "1") {
-              if (items.sessions[i].available_capacity_dose1 > 0) {
-                //console.log("dose is ready");
-                totalDose =
-                  items.sessions[i].available_capacity_dose1 + totalDose;
-              }
-            } else if (!doseId) {
-              if (items.sessions[i].available_capacity > 0) {
-                //console.log("dose is ready");
-                totalDose = items.sessions[i].available_capacity + totalDose;
-              }
-            }
-          }
-        }
-
-        if (ageLimit === "45") {
-          if (items.sessions[i].min_age_limit >= 45) {
-            if (doseId === "2") {
-              if (items.sessions[i].available_capacity_dose2 > 0) {
-                //console.log("dose is ready");
-                totalDose =
-                  items.sessions[i].available_capacity_dose2 + totalDose;
-              }
-            } else if (doseId === "1") {
-              if (items.sessions[i].available_capacity_dose1 > 0) {
-                //console.log("dose is ready");
-                totalDose =
-                  items.sessions[i].available_capacity_dose1 + totalDose;
-              }
-            } else if (!doseId) {
-              if (items.sessions[i].available_capacity > 0) {
-                //console.log("dose is ready");
-                totalDose = items.sessions[i].available_capacity + totalDose;
-              }
-            }
-          }
-        }
-
-        if (!ageLimit) {
-          if (doseId === "2") {
-            if (items.sessions[i].available_capacity_dose2 > 0) {
-              //console.log("dose is ready");
-              totalDose =
-                items.sessions[i].available_capacity_dose2 + totalDose;
-            }
-          } else if (doseId === "1") {
-            if (items.sessions[i].available_capacity_dose1 > 0) {
-              //console.log("dose is ready");
-              totalDose =
-                items.sessions[i].available_capacity_dose1 + totalDose;
-            }
-          } else if (!doseId) {
-            if (items.sessions[i].available_capacity > 0) {
-              //console.log("dose is ready");
-              totalDose = items.sessions[i].available_capacity + totalDose;
-            }
-          }
-        }
-      }
-      // console.log(ageLimit);
-    }
-
-    //console.log(totalDose);
-    if (!doseId) {
-     // console.log("dose id");
-    } else {
-      //console.log("no dose id");
-    }
-    //console.log("after for loop");
-
-    if (totalDose !== 0) {
-      Swal.fire({
-        icon: "success",
-        title: `<span class="text-iconColor-lightGreen font-mono">Hurry up !</span>`,
-        html: `<span class='text-red-red font-mono'>PIN: ${PINCode}, Dose: ${
-          doseId ? doseId : "All results"
-        } </span><span class='text-iconColor-black font-mono'>is ready for book </span> <span class="text-red-red font-mono">Available Doses: ${totalDose}</span>  <iframe title="title alert_sound" class='w-0' src="../images/alert_sound.mp3" allow="autoplay" allow="loop"></iframe>`,
-        backdrop: "rgb(0,0,0,0.8)",
-        showCancelButton: true,
-        cancelButtonText: "Book later",
-        cancelButtonClass: "alert_button bg-gray-300 ml-2 text-iconColor-black",
-        buttonsStyling: false,
-        showConfirmButton: true,
-        confirmButtonClass: "alert_button",
-        confirmButtonText: "Book Now",
-        allowOutsideClick: false,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          window.location.href = "https://selfregistration.cowin.gov.in/";
-          localStorage.clear();
-        }
-        if (result.isDismissed) {
-          localStorage.clear();
-          history.push("/");
-        }
-      });
-    } else if (totalDose === 0 || outData[0]) {
-      Swal.fire({
-        title: "Auto Refreshing !",
-        html: `<p class='font-mono'>Refresh in <b></b><br><br>Do you want cancel auto searching, <span class='text-iconColor-black font-semibold'>PIN:</span> <span class='text-red-red font-bold'> ${PINCode}<span/> , <span class='text-iconColor-black font-semibold'> <span class="text-red-red font-semibold">Dose: ${doseId? doseId : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
-        timer: 360000,
-        timerProgressBar: true,
-        allowOutsideClick: false,
-        confirmButtonText: "Cancel",
-        backdrop: "rgb(0,0,0,0.8)",
-        buttonsStyling: false,
-        confirmButtonClass: "alert_button bg-gray-300",
-
-        didOpen: () => {
-          // Swal.showLoading();
-          timerInterval = setInterval(() => {
-            const content = Swal.getHtmlContainer();
-            if (content) {
-              const b = content.querySelector("b");
-              if (b) {
-                var time = Swal.getTimerLeft() / 60000;
-                b.textContent = time.toFixed(2);
-              }
-            }
-          }, 100);
-        },
-        willClose: () => {
-          clearInterval(timerInterval);
-        },
-      }).then((result) => {
-        if (result.dismiss === Swal.DismissReason.timer) {
-          window.location.reload();
-        }
-        if (result.isConfirmed) {
-          localStorage.clear();
-          Swal.fire({
-            title: "Canceled !",
-            allowOutsideClick: false,
-            html: "<p class='font-mono'>Auto search canceled successfully.</p>",
-            buttonsStyling: false,
-            confirmButtonClass: "alert_button",
-            backdrop: "rgb(0,0,0,0.8)",
-          }).then((result) => {
-            if (result.isConfirmed) {
-              history.push("/");
             }
           });
-        }
-      });
+        })
+        .catch((error) => {
+          Swal.fire({
+            icon: "error",
+            timer: 60000,
+            title: `<p class="text-red-red font-mono opacity-60">Connection failed !</p>`,
+            backdrop: "rgb(0,0,0,0.8)",
+  
+            html: `<p class="font-mono text-iconColor-black">Please check you're internet connection & refresh manually. <iframe title="title alert_sound" class='w-0' src="../images/alert_sound.mp3" allow="autoplay"></iframe></p> `,
+            buttonsStyling: false,
+            confirmButtonClass: "alert_button bg-red-red opacity-60",
+          }).then((result) => {
+            if (result.dismiss === Swal.DismissReason.timer) {
+              window.location.reload();
+            }
+          });
+        });
+        setLoading(false);  
     }
+    getData(); 
+      
+  },[]);
+
+  
+  
+
+
+
+ 
+
+  outData.map((items) => {
+
+    for (let i = 0; i < items.sessions.length; i++) {
+      // console.log(items.sessions[i]);
+       // console.log("loop 1");
+       //console.log(vaccine, items.sessions[i].vaccine);
+ 
+       if (vaccine) {
+         if (vaccine === items.sessions[i].vaccine) {
+           if (ageLimit === "18") {
+             if (items.sessions[i].min_age_limit <= 44) {
+               if (doseId === "2") {
+                 if (items.sessions[i].available_capacity_dose2 > 0) {
+                   //console.log("dose is ready");
+                   totalDose =
+                     items.sessions[i].available_capacity_dose2 + totalDose;
+                 }
+               } else if (doseId === "1") {
+                 if (items.sessions[i].available_capacity_dose1 > 0) {
+                   //console.log("dose is ready");
+                   totalDose =
+                     items.sessions[i].available_capacity_dose1 + totalDose;
+                 }
+               } else if (!doseId) {
+                 if (items.sessions[i].available_capacity > 0) {
+                   //console.log("dose is ready");
+                   totalDose = items.sessions[i].available_capacity + totalDose;
+                 }
+               }
+             }
+           }
+ 
+           if (ageLimit === "45") {
+             if (items.sessions[i].min_age_limit >= 45) {
+               if (doseId === "2") {
+                 if (items.sessions[i].available_capacity_dose2 > 0) {
+                   //console.log("dose is ready");
+                   totalDose =
+                     items.sessions[i].available_capacity_dose2 + totalDose;
+                 }
+               } else if (doseId === "1") {
+                 if (items.sessions[i].available_capacity_dose1 > 0) {
+                   //console.log("dose is ready");
+                   totalDose =
+                     items.sessions[i].available_capacity_dose1 + totalDose;
+                 }
+               } else if (!doseId) {
+                 if (items.sessions[i].available_capacity > 0) {
+                   //console.log("dose is ready");
+                   totalDose = items.sessions[i].available_capacity + totalDose;
+                 }
+               }
+             }
+           }
+ 
+           if (!ageLimit) {
+             if (doseId === "2") {
+               if (items.sessions[i].available_capacity_dose2 > 0) {
+                 //console.log("dose is ready");
+                 totalDose =
+                   items.sessions[i].available_capacity_dose2 + totalDose;
+               }
+             } else if (doseId === "1") {
+               if (items.sessions[i].available_capacity_dose1 > 0) {
+                 //console.log("dose is ready");
+                 totalDose =
+                   items.sessions[i].available_capacity_dose1 + totalDose;
+               }
+             } else if (!doseId) {
+               if (items.sessions[i].available_capacity > 0) {
+                 //console.log("dose is ready");
+                 totalDose = items.sessions[i].available_capacity + totalDose;
+               }
+             }
+           }
+         }
+       } else if (!vaccine) {
+         if (ageLimit === "18") {
+           if (items.sessions[i].min_age_limit <= 44) {
+             if (doseId === "2") {
+               if (items.sessions[i].available_capacity_dose2 > 0) {
+                 //console.log("dose is ready");
+                 totalDose =
+                   items.sessions[i].available_capacity_dose2 + totalDose;
+               }
+             } else if (doseId === "1") {
+               if (items.sessions[i].available_capacity_dose1 > 0) {
+                 //console.log("dose is ready");
+                 totalDose =
+                   items.sessions[i].available_capacity_dose1 + totalDose;
+               }
+             } else if (!doseId) {
+               if (items.sessions[i].available_capacity > 0) {
+                 //console.log("dose is ready");
+                 totalDose = items.sessions[i].available_capacity + totalDose;
+               }
+             }
+           }
+         }
+ 
+         if (ageLimit === "45") {
+           if (items.sessions[i].min_age_limit >= 45) {
+             if (doseId === "2") {
+               if (items.sessions[i].available_capacity_dose2 > 0) {
+                 //console.log("dose is ready");
+                 totalDose =
+                   items.sessions[i].available_capacity_dose2 + totalDose;
+               }
+             } else if (doseId === "1") {
+               if (items.sessions[i].available_capacity_dose1 > 0) {
+                 //console.log("dose is ready");
+                 totalDose =
+                   items.sessions[i].available_capacity_dose1 + totalDose;
+               }
+             } else if (!doseId) {
+               if (items.sessions[i].available_capacity > 0) {
+                 //console.log("dose is ready");
+                 totalDose = items.sessions[i].available_capacity + totalDose;
+               }
+             }
+           }
+         }
+ 
+         if (!ageLimit) {
+           if (doseId === "2") {
+             if (items.sessions[i].available_capacity_dose2 > 0) {
+               //console.log("dose is ready");
+               totalDose =
+                 items.sessions[i].available_capacity_dose2 + totalDose;
+             }
+           } else if (doseId === "1") {
+             if (items.sessions[i].available_capacity_dose1 > 0) {
+               //console.log("dose is ready");
+               totalDose =
+                 items.sessions[i].available_capacity_dose1 + totalDose;
+             }
+           } else if (!doseId) {
+             if (items.sessions[i].available_capacity > 0) {
+               //console.log("dose is ready");
+               totalDose = items.sessions[i].available_capacity + totalDose;
+             }
+           }
+         }
+       }
+       // console.log(ageLimit);
+     }
+ 
+     //console.log(totalDose);
+     if (!doseId) {
+      // console.log("dose id");
+     } else {
+       //console.log("no dose id");
+     }
+     //console.log("after for loop");
+ 
+     if (totalDose !== 0) {
+       Swal.fire({
+         icon: "success",
+         title: `<span class="text-iconColor-lightGreen font-mono">Hurry up !</span>`,
+         html: `<span class='text-red-red font-mono'>PIN: ${PINCode}, Dose: ${
+           doseId ? doseId : "All results"
+         } </span><span class='text-iconColor-black font-mono'>is ready for book </span> <span class="text-red-red font-mono">Available Doses: ${totalDose}</span>  <iframe title="title alert_sound" class='w-0' src="../images/alert_sound.mp3" allow="autoplay" allow="loop"></iframe>`,
+         backdrop: "rgb(0,0,0,0.8)",
+         showCancelButton: true,
+         cancelButtonText: "Book later",
+         cancelButtonClass: "alert_button bg-gray-300 ml-2 text-iconColor-black",
+         buttonsStyling: false,
+         showConfirmButton: true,
+         confirmButtonClass: "alert_button",
+         confirmButtonText: "Book Now",
+         allowOutsideClick: false,
+       }).then((result) => {
+         if (result.isConfirmed) {
+           window.location.href = "https://selfregistration.cowin.gov.in/";
+           localStorage.clear();
+         }
+         if (result.isDismissed) {
+           localStorage.clear();
+           history.push("/");
+         }
+       });
+     } 
+     
+     else if (totalDose === 0 || outData[0]) {
+       Swal.fire({
+         title: "Auto Refreshing !",
+         html: `<p class='font-mono'>Refresh in <b></b><br><br>Do you want cancel auto searching, <span class='text-iconColor-black font-semibold'>PIN:</span> <span class='text-red-red font-bold'> ${PINCode}<span/> , <span class='text-iconColor-black font-semibold'> <span class="text-red-red font-semibold">Dose: ${doseId? doseId : "All"}</span>, <span class="text-red-red font-semibold">Age limit: ${ageLimit? ageLimit>=45? "45+": "18-44" : "All"}</span> <span class='font-normal text-iconColor-black opacity-70'>&</span> <span class="text-red-red font-semibold">Vaccine: ${vaccine? vaccine : "All"}</span>.</p>`,
+         timer: 360000,
+         timerProgressBar: true,
+         allowOutsideClick: false,
+         confirmButtonText: "Cancel",
+         backdrop: "rgb(0,0,0,0.8)",
+         buttonsStyling: false,
+         confirmButtonClass: "alert_button bg-gray-300",
+ 
+         didOpen: () => {
+           // Swal.showLoading();
+           timerInterval = setInterval(() => {
+             const content = Swal.getHtmlContainer();
+             if (content) {
+               const b = content.querySelector("b");
+               if (b) {
+                 var time = Swal.getTimerLeft() / 60000;
+                 b.textContent = time.toFixed(2);
+               }
+             }
+           }, 100);
+         },
+         willClose: () => {
+           clearInterval(timerInterval);
+         },
+       }).then((result) => {
+         if (result.dismiss === Swal.DismissReason.timer) {
+           window.location.reload();
+         }
+         if (result.isConfirmed) {
+           localStorage.clear();
+           Swal.fire({
+             title: "Canceled !",
+             allowOutsideClick: false,
+             html: "<p class='font-mono'>Auto search canceled successfully.</p>",
+             buttonsStyling: false,
+             confirmButtonClass: "alert_button",
+             backdrop: "rgb(0,0,0,0.8)",
+           }).then((result) => {
+             if (result.isConfirmed) {
+               history.push("/");
+             }
+           });
+         }
+       });
+     }
+return null
   });
 
 

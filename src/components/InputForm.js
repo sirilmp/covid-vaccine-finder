@@ -430,12 +430,11 @@ function InputForm() {
       <p className="text-red-red mb-3 font-mono font-semibold">{warning}</p>
         <form>
           <select
-            className="custom_selector"
             onClick={inputDistrictOptions}
             onChange={(e) => {
               setDistrictCode(e.target.value);
             }}
-            className="mr-4 mb-3 cursor-pointer font-mono h-12 pl-3 pr-6 text-base border-iconColor-lightGreen  placeholder-gray-600 border-2 rounded-lg appearance-none focus:outline-none"
+            className="custom_selector mr-4 mb-3 cursor-pointer font-mono h-12 pl-3 pr-6 text-base border-iconColor-lightGreen  placeholder-gray-600 border-2 rounded-lg appearance-none focus:outline-none"
           >
             <option value="">Select a District</option>
             {allDistricts.map((district) => {
