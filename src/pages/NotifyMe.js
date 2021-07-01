@@ -102,8 +102,8 @@ function NotifyMe() {
     setLoading(false);
   }
 
-  useEffect(async () => {
-    await getData();
+  useEffect( () => {
+    getData();
   }, []);
 
   outData.map((items) => {
