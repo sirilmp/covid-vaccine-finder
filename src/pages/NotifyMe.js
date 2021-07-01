@@ -20,8 +20,7 @@ let timerInterval =useRef()
   //get API
 
   useEffect( () => {
-    getData(); 
-      
+getData()
   },[]);
 
   async function getData() {
@@ -32,7 +31,7 @@ let timerInterval =useRef()
       .then((response) => {
         response.json().then((data) => {
           setOutData(data.centers);
-
+console.log(data.centers);
           if (data.centers) {
             if (data.centers && data.centers.length === 0) {
               Swal.fire({
